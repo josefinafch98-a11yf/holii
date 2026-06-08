@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARA TI</title>
+    <link rel="icon" type="image/png" href="ingeniero.png">
+
+
+    
+    <style>
+        :root {
+            --color-bg: #f9f0f2;
+            --color-envelope: #f19ebb;
+            --color-envelope-dark: #e083a2;
+            --color-envelope-light: #f7becf;
+            --color-letter: #ffffff;
+            --color-text: #bd4b73;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-image: url("https://i.pinimg.com/1200x/30/68/2f/30682fe6fcd187c686da274397125eec.jpg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Estilo para la imagen dentro de la carta */
+        .letter-engineer-img {
+            display: block;           
+            margin: 0 auto 5px auto; 
+            width: 80px; 
+            height: auto;
+            filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.1));
+            opacity: 0; 
+            transform: scale(0.5); 
+            transition: all 0.6s ease;
+            transition-delay: 0.5s; 
+        }
+
+        /* Cuando el sobre se abre, la imagen aparece */
+        .envelope-wrapper.open .letter-engineer-img {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Contenedor del sobre (Versión Grande de 400x260) */
+        .envelope-wrapper {
+            position: relative;
+            width: 400px;
+            height: 260px;
+            background-color: var(--color-envelope);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 1;
+            border: 6px solid transparent;
+            border-image: repeating-linear-gradient(45deg, #bd4b73, #bd4b73 10px, #fff 10px, #fff 20px, #e083a2 20px, #e083a2 30px) 6;
+            transition: transform 0.3s ease;
+        }
+
+        /* Tapa del sobre */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-top: 140px solid var(--color-envelope-dark);
+            transform-origin: top;
+            transition: transform 0.4s ease-in-out, z-index 0.2s 0.2s;
+            z-index: 4;
+        }
+
+        /* Lados del sobre */
+        .envelope-wrapper::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 200px solid var(--color-envelope-light);
+            border-top: 130px solid transparent;
+            border-bottom: 130px solid var(--color-envelope-light);
+            z-index: 3;
+        }
+
+        .envelope-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-right: 200px solid var(--color-envelope-light);
+            border-top: 130px solid transparent;
+            border-bottom: 130px solid var(--color-envelope-light);
+            z-index: 3;
+        }
+
+        /* La Carta Grande */
+        .letter {
+            position: absolute;
+            bottom: 10px;
+            left: 15px;
+            width: 370px;
+            height: 240px;
+            background-color: var(--color-letter);
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: transform 0.5s ease-in-out, z-index 0.1s 0.2s;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center; 
+        }
+
+        .letter h1 {
+            color: var(--color-text);
+            font-size: 22px;
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;     
+            margin-bottom: 8px;  
+        }
+
+        /* Configuración para el texto largo */
+        .letter p {
+            color: #555;
+            font-size: 15px;
+            text-align: center;
+            width: 100%;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+            white-space: normal; 
+            overflow: visible;
+        }
+
+        /* Estilo para cada letra individual */
+        .letter p span {
+            opacity: 0; 
+            display: inline-block;
+            transition: opacity 0.05s ease; 
+        }
+
+        /* Cuando se revela la letra */
+        .letter p span.revealed {
+            opacity: 1;
+        }
+        
+        /* Datos del remitente */
+        .envelope-info {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            font-size: 13px;
+            color: #7a6e71;
+            z-index: 5;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .envelope-info strong {
+            color: #554a4c;
+        }
+
+        /* Texto de instrucción */
+        .instruction {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #f6f4f4;
+            animation: bounce 1.5s infinite;
+        }
+
+        /* Estilo base del sticker */
+        .envelope-sticker {
+            position: absolute;
+            top: 110px;        
+            left: 50%;
+            transform: translateX(-50%) scale(1);
+            font-size: 45px;   
+            z-index: 15;       
+            transition: transform 0.4s ease-in-out, opacity 0.3s ease;
+            cursor: pointer;
+            pointer-events: none; 
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15));
+        }
+
+        /* --- ANIMACIONES AL HACER CLICK --- */
+        .envelope-wrapper.open .envelope-sticker {
+            opacity: 0;             
+            transform: translateX(-50%) scale(0); 
+            transition: opacity 0.3s ease, transform 0.4s ease; 
+        }
+
+        .envelope-wrapper.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+        
+        .envelope-wrapper.open .letter {
+            transform: translateY(-110px); 
+            height: 310px;                 
+            z-index: 5;
+        }
+
+        .envelope-wrapper.open .envelope-info {
+            opacity: 0;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Emojis del clic general */
+        .click-emoji {
+            position: absolute;
+            font-size: 40px;
+            pointer-events: none; 
+            z-index: 999; 
+            animation: flotarEfecto 1.5s ease-out forwards;
+        }
+
+        @keyframes flotarEfecto {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50px) scale(1.2) rotate(var(--rotacion));
+            }
+            100% {
+                transform: translateY(-120px) scale(1) rotate(var(--rotacion));
+                opacity: 0;
+            }
+        }
+
+        /* Lluvia de emojis que cae */
+        .rain-emoji {
+            position: absolute;
+            top: -20px; 
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 100;
+            animation: caerEfecto var(--duracion) linear forwards;
+        }
+
+        @keyframes caerEfecto {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1; 
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(var(--desvío-x)) rotate(var(--rotacion-final));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="background-music" src="musica.mp3" loop></audio>
+
+    <div class="envelope-wrapper" id="envelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-sticker">❃</div>
+        
+        <div class="letter">
+            <img src="https://afraid-harlequin-itlbn2pv.edgeone.app/ingeniero.png" class="letter-engineer-img">
+            <h1>¡Feliz día del Ingeniero!</h1>
+            <p> Tu esfuerzo , paciencia y dedicación no siempre <br>se ven, pero están en todo lo que haces.</p>
+            <p>Eres una gran persona</p>
+            <p>Nunca pierdas tu esencia, Zacarias 🥳✨</p>
+        </div>
+
+        <div class="envelope-info">
+            Para: <strong>Zacarias</strong><br>
+            De: <strong>Josefina</strong>
+        </div>
+    </div>
+
+    <div class="instruction" id="instruction-text">✉️ Haz clic en el sobre</div>
+
+    <script>
+        const envelope = document.getElementById('envelope');
+        const instruction = document.getElementById('instruction-text');
+        const paragraphs = document.querySelectorAll('.letter p');
+        const music = document.getElementById('background-music');
+
+        // 1. Fragmentar el texto en letras individuales usando spans
+        paragraphs.forEach(p => {
+            const text = p.textContent;
+            p.innerHTML = ''; 
+            
+            for (let char of text) {
+                const span = document.createElement('span');
+                span.innerHTML = char === ' ' ? '&nbsp;' : char; 
+                p.appendChild(span);
+            }
+        });
+
+        // 2. Controlar clics del sobre, música y activar la lluvia
+        envelope.addEventListener('click', () => {
+            envelope.classList.toggle('open');
+            if(envelope.classList.contains('open')) {
+                instruction.textContent = "✨ Haz clic de nuevo para guardarla";
+                
+                // Reproducir música local corregida
+                music.play().catch(error => console.log("Audio retenido por el navegador hasta interacción:", error));
+                
+                // ACTIVACIÓN DE LA LLUVIA DE EMOJIS
+                crearLluviaEmojis();
+                
+                // Espera 0.8 segundos a que la carta suba por completo para empezar a tipear
+                setTimeout(() => {
+                    animateLetterByLetter();
+                }, 800);
+            } else {
+                instruction.textContent = "✉️ Haz clic en el sobre";
+                
+                // Pausar música si se cierra
+                music.pause();
+                
+                // Limpia el efecto para que pueda repetirse al cerrar
+                const allSpans = document.querySelectorAll('.letter p span');
+                allSpans.forEach(span => span.classList.remove('revealed'));
+            }
+        });
+
+        // 3. Función secuencial de máquina de escribir letra por letra
+        function animateLetterByLetter() {
+            const allSpans = document.querySelectorAll('.letter p span');
+            let index = 0;
+            
+            function revealNext() {
+                if (!envelope.classList.contains('open')) return; 
+                
+                if (index < allSpans.length) {
+                    allSpans[index].classList.add('revealed');
+                    index++;
+                    setTimeout(revealNext, 35); 
+                }
+            }
+            revealNext();
+        }
+
+        // 4. Función que genera la lluvia de emojis por pantalla al abrir
+        function crearLluviaEmojis() {
+            const listaEmojis = ['✨'];
+            const cantidad = 50; 
+
+            for (let i = 0; i < cantidad; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'rain-emoji';
+                emoji.innerHTML = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
+                
+                emoji.style.left = Math.random() * 100 + 'vw';
+                emoji.style.animationDelay = Math.random() * 2.0 + 's';
+                
+                const duration = Math.random() * 2 + 2;
+                emoji.style.setProperty('--duracion', duration + 's');
+                
+                emoji.style.setProperty('--desvío-x', (Math.random() * 100 - 50) + 'px');
+                emoji.style.setProperty('--rotacion-final', (Math.random() * 360) + 'deg');
+                
+                document.body.appendChild(emoji);
+                
+                setTimeout(() => {
+                    emoji.remove();
+                }, (duration + 1.5) * 1000);
+            }
+        }
+
+        // Detecta el clic en el fondo para lanzar emojis sueltos
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#envelope')) return;
+
+            const emoji = document.createElement('div');
+            emoji.className = 'click-emoji';
+            
+            const listaEmojis = ['✨','🥳','🎉'];
+            emoji.innerHTML = listaEmojis[Math.floor(Math.random() * listaEmojis.length)];
+            
+            emoji.style.left = (e.clientX - 20) + 'px';
+            emoji.style.top = (e.clientY - 20) + 'px';
+            
+            emoji.style.setProperty('--rotacion', (Math.random() * 60 - 30) + 'deg');
+            
+            document.body.appendChild(emoji);
+            
+            setTimeout(() => {
+                emoji.remove();
+            }, 1500);
+        });
+    </script>
+
+</body>
+</html>
